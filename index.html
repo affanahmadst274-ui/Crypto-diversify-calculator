@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Crypto Diversify Calculator</title>
+  <title>Crypto Diversify Calculator — v2 (2025)</title>
   <style>
     :root{--bg:#071022;--card:#071429;--muted:#94a3b8;--accent:#60a5fa;--glass:rgba(255,255,255,0.03)}
     html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;color:#e6eef8;background:linear-gradient(180deg,#071022 0%, #071827 100%);}
-    .app{max-width:1100px;margin:28px auto;padding:22px}
+    .app{max-width:1150px;margin:20px auto;padding:20px}
     header{display:flex;gap:16px;align-items:center;}
     h1{margin:0;font-size:20px}
     .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:14px;box-shadow:0 6px 20px rgba(2,6,23,0.5);}
@@ -15,7 +15,7 @@
     th,td{padding:8px 10px;text-align:left;font-size:14px}
     th{color:var(--muted);font-weight:600}
     td small{color:var(--muted)}
-    input[type=number], input[type=text]{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px;border-radius:8px;color:#e6eef8}
+    input[type=number], input[type=text], textarea, select{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px;border-radius:8px;color:#e6eef8}
     .controls{display:flex;gap:8px;align-items:center;margin-top:12px}
     .btn{background:var(--accent);color:#03203a;padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
     .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
@@ -23,29 +23,27 @@
     .row-actions{display:flex;gap:8px}
     .chips{display:flex;gap:6px;flex-wrap:wrap}
     .chip{background:var(--glass);padding:6px 8px;border-radius:999px;font-size:12px;color:var(--muted)}
-    .summary{display:grid;grid-template-columns:1fr 360px;gap:12px;margin-top:12px}
+    .summary{display:grid;grid-template-columns:1fr 380px;gap:12px;margin-top:12px}
     .right .card{height:100%}
-    .list{max-height:420px;overflow:auto}
+    .list{max-height:520px;overflow:auto}
     .percent-danger{color:#ffb4b4}
     footer{margin-top:18px;color:var(--muted);font-size:13px}
-    details{background:rgba(255,255,255,0.02);padding:8px;border-radius:8px}
-    .coin-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-    .coin-item{background:rgba(255,255,255,0.02);padding:6px 8px;border-radius:8px}
-    .results-table td{font-weight:600}
-    .small{font-size:13px}
     .expand-panel{background:rgba(255,255,255,0.02);padding:10px;margin-top:8px;border-radius:8px}
     .weight-input{width:90px}
     .coin-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
     .save-note{font-size:12px;color:var(--muted)}
-    @media(max-width:880px){.summary{grid-template-columns:1fr;}.right{order:2}}
+    .top-actions{display:flex;gap:8px;align-items:center}
+    .danger{background:#ff7b7b;color:#2b0202}
+    .small{font-size:13px}
+    @media(max-width:980px){.summary{grid-template-columns:1fr;}.right{order:2}}
   </style>
 </head>
 <body>
   <div class="app">
     <header>
       <div>
-        <h1>Crypto Diversify Calculator</h1>
-        <div class="muted small">Edit allocations, set your total investment, and see per-sector & per-coin amounts. Custom coin weights per sector are supported.</div>
+        <h1>Crypto Diversify Calculator — v2 (2025)</h1>
+        <div class="muted small">Updated 2025 default sectors. Edit allocations, add/delete sectors, set per-coin weights, and calculate per-coin amounts.</div>
       </div>
     </header>
 
@@ -56,9 +54,10 @@
             <strong>Your Portfolio Template</strong>
             <div class="muted small">Sectors, example coins and suggested allocations (editable)</div>
           </div>
-          <div class="controls">
+          <div class="top-actions">
+            <button class="btn" id="addSectorBtn">+ Add Sector</button>
             <button class="btn" id="normalizeBtn">Normalize to 100%</button>
-            <button class="btn ghost" id="resetBtn">Reset</button>
+            <button class="btn ghost" id="resetBtn">Reset to defaults</button>
           </div>
         </div>
 
@@ -68,9 +67,9 @@
               <tr>
                 <th style="width:36px">#</th>
                 <th>Sector / Narrative</th>
-                <th style="width:250px">Example Coins</th>
-                <th style="width:140px">Allocation %</th>
-                <th style="width:160px">Actions</th>
+                <th style="width:260px">Example Coins</th>
+                <th style="width:120px">Allocation %</th>
+                <th style="width:180px">Actions</th>
               </tr>
             </thead>
             <tbody id="sectorsTbody"></tbody>
@@ -89,11 +88,12 @@
           </div>
 
           <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
-            <input id="totalInvestment" type="number" min="0" step="0.01" value="10000" style="flex:1" />
+            <input id="totalInvestment" type="number" min="0" step="0.01" placeholder="Enter amount (e.g. 10000)" style="flex:1" />
             <select id="currency">
               <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="PKR">PKR</option>
               <option value="USDT">USDT</option>
-              <option value="BTC">BTC</option>
             </select>
             <button class="btn" id="calcBtn">Calculate</button>
           </div>
@@ -101,7 +101,7 @@
           <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.04)" />
 
           <div id="results">
-            <div class="muted small">Sector breakdown (expand a sector to edit coin weights)</div>
+            <div class="muted small">Sector breakdown (expand a sector to edit coin weights or delete)</div>
             <table class="results-table" style="width:100%;margin-top:8px">
               <thead>
                 <tr><th>Sector</th><th style="text-align:right">% / Amount</th></tr>
@@ -112,7 +112,7 @@
             <div style="height:12px"></div>
 
             <strong>Per-coin breakdown</strong>
-            <div class="muted small">Coin • Sector • Coin % of total • Amount</div>
+            <div class="muted small">Sector • Coin • Coin % of total • Amount</div>
             <table style="width:100%;margin-top:8px;border-collapse:collapse">
               <thead>
                 <tr><th>Sector</th><th>Coin</th><th style="text-align:right">Coin % (of total)</th><th style="text-align:right">Amount</th></tr>
@@ -126,35 +126,35 @@
 
         <div class="card">
           <strong>Notes & saving</strong>
-          <div class="muted small">Your settings (sectors, coins, allocations, custom weights) are saved locally in your browser. Use the Reset button to restore defaults.</div>
+          <div class="muted small">Your settings are saved locally in your browser. Use Reset to restore the 2025 defaults. You can also add/delete sectors.</div>
           <div class="save-note" id="saveNote">Last saved: never</div>
         </div>
       </div>
     </div>
 
-    <footer class="muted small">Save this single file to a GitHub repo and open it (GitHub Pages or directly) — no server required. Want CSV export or charts? Ask and I'll add them.</footer>
+    <footer class="muted small">Save this single file to a GitHub repo (rename to index.html if you want root URL). Need CSV export or charts? Ask and I'll add them.</footer>
   </div>
 
   <script>
-    // Default template taken from user's table
-    const defaultSectors = [
-      {id:1,name:'Store of Value / Digital Gold', coins:['BTC','XMR'], pct:25, rationale:'Foundation of most portfolios. BTC is the anchor; small XMR exposure.', weights:null},
-      {id:2,name:'Smart Contract Platforms (L1s)', coins:['ETH','SOL','AVAX'], pct:20, rationale:'Key growth layer; ETH main, SOL/AVAX higher-beta.', weights:null},
-      {id:3,name:'Scaling / Layer-2s', coins:['MATIC','ARB'], pct:10, rationale:'Rising importance in Ethereum ecosystem.', weights:null},
-      {id:4,name:'Interoperability / Oracles', coins:['LINK','GRT'], pct:7, rationale:'Infrastructure play; essential tech but slower-moving.', weights:null},
-      {id:5,name:'Real World Assets (RWA)', coins:['CFG','ONDO'], pct:5, rationale:'Early stage; tokenised finance.', weights:null},
-      {id:6,name:'DePIN', coins:['HNT','RNDR'], pct:5, rationale:'Experimental real-world compute/storage.', weights:null},
-      {id:7,name:'DeFi', coins:['AAVE','UNI'], pct:8, rationale:'Core on-chain finance.', weights:null},
-      {id:8,name:'Gaming / Metaverse', coins:['SAND','MANA'], pct:5, rationale:'Highly speculative.', weights:null},
-      {id:9,name:'Meme / Community Coins', coins:['DOGE','SHIB'], pct:3, rationale:'Pure hype/speculation.', weights:null},
-      {id:10,name:'Stablecoins / Payments', coins:['USDT','USDC'], pct:12, rationale:'Dry powder for stability.', weights:null}
+    // 2025 default template
+    const defaultSectorsV2 = [
+      {id:1,name:'Store of Value / Digital Gold', coins:['BTC','eBTC'], pct:20, rationale:'Core low-risk base of most portfolios.', weights:null},
+      {id:2,name:'Smart Contract Platforms (L1s)', coins:['ETH','SOL','SUI'], pct:15, rationale:'Foundational layer for dApps and smart contracts.', weights:null},
+      {id:3,name:'Scaling / Layer-2s', coins:['ARB','OP','MATIC'], pct:10, rationale:'Throughput and cost reduction for Ethereum.', weights:null},
+      {id:4,name:'Interoperability / Oracles', coins:['LINK','ATOM','GRT'], pct:6, rationale:'Connects blockchains and real-world data.', weights:null},
+      {id:5,name:'AI & Data Economy', coins:['FET','TAO','AGIX'], pct:8, rationale:'AI agents, data marketplaces and compute tokens.', weights:null},
+      {id:6,name:'Real World Assets (RWA)', coins:['ONDO','POLYX','MKR'], pct:7, rationale:'Tokenized finance: bonds, real estate, credit.', weights:null},
+      {id:7,name:'DePIN (Physical Infrastructure)', coins:['RNDR','HNT','AKT'], pct:6, rationale:'Compute, storage and sensor infra.', weights:null},
+      {id:8,name:'DeFi 2.0', coins:['AAVE','UNI','GMX'], pct:8, rationale:'Evolved liquidity, yield and trading infra.', weights:null},
+      {id:9,name:'Gaming / Metaverse', coins:['PYR','IMX','AXS'], pct:5, rationale:'Selective exposure to web3 gaming platforms.', weights:null},
+      {id:10,name:'Meme / Community Coins', coins:['DOGE','BONK','PEPE'], pct:5, rationale:'High-risk speculative community tokens.', weights:null},
+      {id:11,name:'Stablecoins / Payments', coins:['USDC','PYUSD'], pct:10, rationale:'Capital buffer and liquidity management.', weights:null}
     ];
 
-    const STORAGE_KEY = 'crypto_diversify_v2';
-
+    const STORAGE_KEY = 'crypto_diversify_v2_2025';
     let sectors = loadSectors();
 
-    // --- DOM refs
+    // DOM refs
     const tbody = document.getElementById('sectorsTbody');
     const totalInvestmentEl = document.getElementById('totalInvestment');
     const calcBtn = document.getElementById('calcBtn');
@@ -164,6 +164,7 @@
     const remainingAllocEl = document.getElementById('remainingAlloc');
     const normalizeBtn = document.getElementById('normalizeBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const addSectorBtn = document.getElementById('addSectorBtn');
     const saveNote = document.getElementById('saveNote');
 
     function loadSectors(){
@@ -174,7 +175,8 @@
           if(obj && obj.sectors) return obj.sectors;
         }
       }catch(e){console.warn('load failed',e)}
-      return JSON.parse(JSON.stringify(defaultSectors));
+      // always return the default copy (ensures app never shows blank)
+      return JSON.parse(JSON.stringify(defaultSectorsV2));
     }
 
     function saveSectors(){
@@ -190,10 +192,10 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${s.id}</td>
-          <td><strong>${s.name}</strong><div class='muted small'>${s.rationale}</div></td>
-          <td><div class='chips'>${s.coins.map(c=>`<span class='chip'>${c}</span>`).join('')}</div></td>
+          <td><strong contenteditable='true' data-idx='${idx}' data-field='name' class='editable'>${escapeHtml(s.name)}</strong><div class='muted small'>${escapeHtml(s.rationale)}</div></td>
+          <td><div class='chips' id='chips-${idx}'>${s.coins.map(c=>`<span class='chip'>${c}</span>`).join('')} </div></td>
           <td><input type='number' min='0' max='100' step='0.01' data-idx='${idx}' class='allocInput' value='${s.pct}'></td>
-          <td class='row-actions'><button class='btn ghost' data-idx='${idx}' data-action='toggle'>Custom Weights</button><button class='btn' data-idx='${idx}' data-action='edit'>Edit coins</button></td>
+          <td class='row-actions'><button class='btn ghost' data-idx='${idx}' data-action='toggle'>Custom Weights</button><button class='btn' data-idx='${idx}' data-action='edit'>Edit coins</button><button class='btn danger' data-idx='${idx}' data-action='delete'>Delete</button></td>
         `;
         tbody.appendChild(tr);
 
@@ -202,7 +204,12 @@
         const panelTd = document.createElement('td');
         panelTd.colSpan = 5;
         panelTd.innerHTML = `<div class='expand-panel' id='panel-${idx}' style='display:none'>
-            <div class='muted small'>Set custom weights for each coin in this sector. Values must add to 100% to take effect. Leave blank to use equal split.</div>
+            <div style='display:flex;gap:8px;align-items:center;justify-content:space-between'>
+              <div class='muted small'>Set custom weights for each coin in this sector. Values must add to 100% to take effect. Leave blank to use equal split.</div>
+              <div>
+                <button class='btn ghost' data-idx='${idx}' data-action='addCoinInline'>+ Coin</button>
+              </div>
+            </div>
             <div class='weight-list' id='weight-list-${idx}' style='margin-top:8px'></div>
             <div style='margin-top:8px;display:flex;gap:8px'><button class='btn' data-idx='${idx}' data-action='saveWeights'>Save Weights</button><button class='btn ghost' data-idx='${idx}' data-action='clearWeights'>Clear</button><div style='flex:1'></div><div class='muted small' id='weight-sum-${idx}'>Sum: 0%</div></div>
           </div>`;
@@ -221,6 +228,13 @@
         }
       });
 
+      document.querySelectorAll('.editable').forEach(el=>{
+        el.onblur = (e)=>{
+          const idx = +e.target.dataset.idx; const field = e.target.dataset.field;
+          sectors[idx][field] = e.target.textContent.trim(); saveSectors(); renderSectors();
+        }
+      });
+
       document.querySelectorAll('button[data-action]').forEach(btn=>{
         btn.onclick = (e)=>{
           const i = +btn.dataset.idx;
@@ -229,6 +243,8 @@
           if(action==='toggle') togglePanel(i);
           if(action==='saveWeights') saveWeights(i);
           if(action==='clearWeights') clearWeights(i);
+          if(action==='delete') deleteSector(i);
+          if(action==='addCoinInline') addCoinInline(i);
         }
       });
 
@@ -238,26 +254,25 @@
       updateTotals(false);
     }
 
+    function escapeHtml(s){ return (s+'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
     function renderWeightList(idx){
       const s = sectors[idx];
       const container = document.getElementById('weight-list-'+idx);
       if(!container) return;
       container.innerHTML='';
-      // weights override equal-split if present and sums to ~100
       s.coins.forEach((c,i)=>{
         const row = document.createElement('div');
         row.className='coin-row';
         const wVal = (s.weights && s.weights[c] !== undefined) ? s.weights[c] : '';
-        row.innerHTML = `<div style='width:120px'><strong>${c}</strong></div><input class='weight-input' type='number' min='0' max='100' step='0.01' data-sector='${idx}' data-coin='${c}' value='${wVal}' placeholder=''></input><div class='muted small'>%</div>`;
+        row.innerHTML = `<div style='width:120px'><strong contenteditable='true' data-sector='${idx}' data-coinname='${c}' class='coin-name'>${c}</strong></div><input class='weight-input' type='number' min='0' max='100' step='0.01' data-sector='${idx}' data-coin='${c}' value='${wVal}' placeholder=''></input><button class='btn ghost' data-sector='${idx}' data-remcoin='${c}'>Remove</button>`;
         container.appendChild(row);
       });
 
       // attach weight input listeners
-      container.querySelectorAll('input').forEach(inp=>{
-        inp.oninput = ()=>{
-          updateWeightSum(idx);
-        }
-      });
+      container.querySelectorAll('input').forEach(inp=>{ inp.oninput = ()=>{ updateWeightSum(idx); } });
+      container.querySelectorAll('button[data-remcoin]').forEach(b=>{ b.onclick = ()=>{ const coin = b.dataset.remcoin; removeCoin(idx,coin); } });
+      container.querySelectorAll('.coin-name').forEach(el=>{ el.onblur = (e)=>{ const newName = e.target.textContent.trim(); const oldName = e.target.dataset.coinname; if(newName && newName!==oldName){ sectors[idx].coins = sectors[idx].coins.map(c=> c===oldName? newName:c); if(sectors[idx].weights){ sectors[idx].weights[newName] = sectors[idx].weights[oldName]; delete sectors[idx].weights[oldName]; } saveSectors(); renderSectors(); } } });
 
       updateWeightSum(idx);
     }
@@ -272,7 +287,7 @@
         if(!isNaN(v)) sum += v;
       });
       sumEl.textContent = 'Sum: ' + sum.toFixed(2) + '%';
-      if(Math.abs(sum-100) > 0.01) sumEl.style.color = '#ffb4b4'; else sumEl.style.color = '';
+      sumEl.style.color = Math.abs(sum-100) > 0.01 ? '#ffb4b4' : '';
     }
 
     function saveWeights(idx){
@@ -285,97 +300,71 @@
         const v = parseFloat(inp.value||'');
         if(!isNaN(v) && inp.value!==''){ weights[coin]=v; sum += v; }
       });
-      if(Object.keys(weights).length===0){
-        s.weights = null;
-        alert('Cleared custom weights: equal split will be used for this sector.');
-      } else {
-        if(Math.abs(sum-100) > 0.01){ alert('Weights must sum to 100% — current sum is '+sum.toFixed(2)+'%'); return; }
-        s.weights = weights;
-        alert('Saved custom weights for '+s.name);
-      }
-      renderSectors();
-      saveSectors();
+      if(Object.keys(weights).length===0){ s.weights = null; alert('Cleared custom weights: equal split will be used for this sector.'); }
+      else { if(Math.abs(sum-100) > 0.01){ alert('Weights must sum to 100% — current sum is '+sum.toFixed(2)+'%'); return; } s.weights = weights; alert('Saved custom weights for '+s.name); }
+      renderSectors(); saveSectors();
     }
 
-    function clearWeights(idx){
-      sectors[idx].weights = null;
-      renderSectors();
-      saveSectors();
+    function clearWeights(idx){ sectors[idx].weights = null; renderSectors(); saveSectors(); }
+
+    function togglePanel(idx){ const panel = document.getElementById('panel-'+idx); if(!panel) return; panel.style.display = panel.style.display === 'none' ? 'block' : 'none'; }
+
+    function editCoins(i){ const s = sectors[i]; const newVal = prompt('Edit comma-separated coins for "'+s.name+'"', s.coins.join(',')); if(newVal!==null){ const arr = newVal.split(',').map(x=>x.trim()).filter(Boolean); if(arr.length===0) alert('Please provide at least one coin.'); else { s.coins = arr; s.weights = null; renderSectors(); saveSectors(); } } }
+
+    function addCoinInline(idx){ const name = prompt('New coin symbol (e.g. MYCOIN)'); if(!name) return; sectors[idx].coins.push(name.trim()); renderSectors(); saveSectors(); }
+
+    function removeCoin(idx, coin){ if(!confirm('Remove coin '+coin+' from sector '+sectors[idx].name+'?')) return; sectors[idx].coins = sectors[idx].coins.filter(c=>c!==coin); if(sectors[idx].weights && sectors[idx].weights[coin]){ delete sectors[idx].weights[coin]; } renderSectors(); saveSectors(); }
+
+    function deleteSector(idx){ if(!confirm('Delete sector "'+sectors[idx].name+'"?')) return; sectors.splice(idx,1); // re-id
+      sectors = sectors.map((s,i)=>({...s,id:i+1})); renderSectors(); saveSectors(); }
+
+    function addSector(){
+      const name = prompt('Sector name (e.g. New Narrative)'); if(!name) return;
+      const coins = prompt('Comma-separated coin symbols for this sector (e.g. ABC,DEF)').split(',').map(x=>x.trim()).filter(Boolean);
+      const pct = parseFloat(prompt('Allocation % for this sector (e.g. 3)','1')||0);
+      const rationale = prompt('Short rationale (optional)','');
+      const id = sectors.length+1;
+      sectors.push({id,name,coins,pct:rationale?pct:pct,rationale:rationale||'',weights:null});
+      renderSectors(); saveSectors();
     }
 
-    function togglePanel(idx){
-      const panel = document.getElementById('panel-'+idx);
-      if(!panel) return;
-      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function editCoins(i){
-      const s = sectors[i];
-      const newVal = prompt('Edit comma-separated coins for "'+s.name+'"', s.coins.join(','));
-      if(newVal!==null){
-        const arr = newVal.split(',').map(x=>x.trim()).filter(Boolean);
-        if(arr.length===0) alert('Please provide at least one coin.'); else { s.coins = arr; s.weights = null; renderSectors(); saveSectors(); }
-      }
-    }
+    addSectorBtn.onclick = addSector;
 
     function updateTotals(highlight=true){
       const total = sectors.reduce((a,b)=>a+(Number(b.pct)||0),0);
       totalAllocEl.textContent = (Math.round(total*100)/100).toFixed(2);
       const rem = Math.round((100-total)*100)/100;
       remainingAllocEl.textContent = rem.toFixed(2);
-      if(highlight && Math.abs(total-100) > 0.0001){
-        remainingAllocEl.classList.add('percent-danger');
-      } else {
-        remainingAllocEl.classList.remove('percent-danger');
-      }
+      if(highlight && Math.abs(total-100) > 0.0001){ remainingAllocEl.classList.add('percent-danger'); } else { remainingAllocEl.classList.remove('percent-danger'); }
     }
 
-    function normalize(){
-      let total = sectors.reduce((a,b)=>a+(Number(b.pct)||0),0);
-      if(total===0){ alert('All allocations sum to 0. Set at least one non-zero allocation.'); return; }
-      sectors = sectors.map(s=>{ return {...s, pct: (s.pct/total)*100 }; });
-      renderSectors();
-      saveSectors();
-    }
+    function normalize(){ let total = sectors.reduce((a,b)=>a+(Number(b.pct)||0),0); if(total===0){ alert('All allocations sum to 0. Set at least one non-zero allocation.'); return; } sectors = sectors.map(s=>{ return {...s, pct: (s.pct/total)*100 }; }); renderSectors(); saveSectors(); }
 
-    function resetTemplate(){ if(!confirm('Reset template to defaults? This will clear custom weights.')) return; sectors = JSON.parse(JSON.stringify(defaultSectors)); renderSectors(); saveSectors(); }
+    function resetTemplate(){ if(!confirm('Reset to 2025 defaults? This will clear custom weights and your changes.')) return; sectors = JSON.parse(JSON.stringify(defaultSectorsV2)); renderSectors(); saveSectors(); }
 
     function calculate(){
       const total = Number(totalInvestmentEl.value||0);
       if(total<=0){ alert('Set a positive total investment.'); return; }
       const totalPct = sectors.reduce((a,b)=>a+(Number(b.pct)||0),0);
-      if(Math.abs(totalPct-100) > 0.01){
-        const ok = confirm('Allocations do not sum to 100% (they sum to '+totalPct.toFixed(2)+'%).
-Would you like to normalize them automatically?');
-        if(ok){ normalize(); }
-      }
+      if(Math.abs(totalPct-100) > 0.01){ const ok = confirm('Allocations do not sum to 100% (they sum to '+totalPct.toFixed(2)+'%).\nWould you like to normalize them automatically?'); if(ok){ normalize(); } }
 
-      // build results
-      resultsTbody.innerHTML='';
-      perCoinTbody.innerHTML='';
+      resultsTbody.innerHTML=''; perCoinTbody.innerHTML='';
+      const cur = document.getElementById('currency').value;
 
       sectors.forEach(s=>{
         const sectorPct = Number(s.pct)||0;
         const sectorAmount = total*(sectorPct/100);
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${s.name}</td><td style='text-align:right'>${sectorPct.toFixed(2)}% / ${formatMoney(sectorAmount)}</td>`;
+        tr.innerHTML = `<td>${s.name}</td><td style='text-align:right'>${sectorPct.toFixed(2)}% / ${formatMoney(sectorAmount,cur)}</td>`;
         resultsTbody.appendChild(tr);
 
         // determine per-coin distribution
         let coinPercents = {};
         if(s.weights && Object.keys(s.weights).length>0){
-          // use custom weights (percent of sector)
-          Object.entries(s.weights).forEach(([coin,w])=>{
-            coinPercents[coin] = (sectorPct*(w/100)); // coin percent of total
-          });
-          // if there are coins missing from weights, distribute remaining equally
+          Object.entries(s.weights).forEach(([coin,w])=>{ coinPercents[coin] = (sectorPct*(w/100)); });
           const missing = s.coins.filter(c=>!(c in coinPercents));
-          if(missing.length>0){
-            const remainingPct = sectorPct - Object.values(coinPercents).reduce((a,b)=>a+b,0);
-            missing.forEach(m=> coinPercents[m] = remainingPct / missing.length);
-          }
+          if(missing.length>0){ const remainingPct = sectorPct - Object.values(coinPercents).reduce((a,b)=>a+b,0); missing.forEach(m=> coinPercents[m] = remainingPct / missing.length); }
         } else {
-          // equal split
           s.coins.forEach(c=> coinPercents[c] = sectorPct / s.coins.length);
         }
 
@@ -383,7 +372,7 @@ Would you like to normalize them automatically?');
           const coinPct = coinPercents[c] || 0;
           const coinAmount = total * (coinPct/100);
           const trc = document.createElement('tr');
-          trc.innerHTML = `<td style='padding-left:18px'>${s.name}</td><td>${c}</td><td style='text-align:right'>${coinPct.toFixed(4)}%</td><td style='text-align:right'>${formatMoney(coinAmount)}</td>`;
+          trc.innerHTML = `<td style='padding-left:18px'>${s.name}</td><td>${c}</td><td style='text-align:right'>${coinPct.toFixed(4)}%</td><td style='text-align:right'>${formatMoney(coinAmount,cur)}</td>`;
           perCoinTbody.appendChild(trc);
         });
       });
@@ -391,9 +380,14 @@ Would you like to normalize them automatically?');
       saveSectors();
     }
 
-    function formatMoney(x){
-      const cur = document.getElementById('currency').value;
-      if(cur==='USD' || cur==='USDT' || cur==='USDC') return '$'+Number(x).toLocaleString(undefined,{maximumFractionDigits:2});
+    function formatMoney(x, cur){
+      if(!isFinite(x)) x = 0;
+      if(cur==='USD' || cur==='EUR' || cur==='PKR'){
+        // show currency symbol heuristically
+        const sym = cur==='USD' ? '$' : cur==='EUR' ? '€' : '';
+        return (sym?sym:'') + Number(x).toLocaleString(undefined,{maximumFractionDigits:2});
+      }
+      if(cur==='USDT') return Number(x).toLocaleString(undefined,{maximumFractionDigits:2}) + ' USDT';
       return Number(x).toLocaleString(undefined,{maximumFractionDigits:8}) + ' ' + cur;
     }
 
@@ -403,14 +397,10 @@ Would you like to normalize them automatically?');
     resetBtn.onclick = resetTemplate;
 
     // initial render
-    renderSectors();
-    updateTotals(false);
+    renderSectors(); updateTotals(false);
 
     // keyboard support
-    document.addEventListener('keydown', e=>{
-      if(e.key==='Enter') calculate();
-    });
+    document.addEventListener('keydown', e=>{ if(e.key==='Enter') calculate(); });
   </script>
 </body>
 </html>
-
